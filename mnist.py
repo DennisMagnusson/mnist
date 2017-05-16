@@ -13,11 +13,6 @@ class Net:
 	def __init__(self):
 		sd = 0.1
 		with tf.device("/cpu:0"):
-			#W1 = tf.Variable(tf.truncated_normal([784, 10], stddev=sd))
-			#B1 = tf.Variable(tf.constant(0.1, tf.float32, [10]))
-
-			#self.a = tf.reshape(X, shape=[-1, 28*28])
-			#self.Y = tf.nn.softmax(tf.matmul(self.a, W1) + B1)
 			"""
 			The default values
 			c1 = 24
@@ -105,3 +100,15 @@ for ep in range(50):
 	print(sess.run(accuracy, feed_dict={X: mnist.test.images, y_: mnist.test.labels}))
 
 
+
+
+
+def convert(l, k):
+	li = []
+	for i in l:
+		if i[k] == 1:
+			li.append([1, 0])
+		else:
+			li.append([0, 1])
+
+	return np.array(li)
