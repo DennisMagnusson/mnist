@@ -63,13 +63,12 @@ y_= tf.placeholder(tf.float32, [None, 10])
 lr= tf.placeholder(tf.float32)
 training = tf.placeholder(tf.bool)
 
-sd = 0.1
-with tf.device("/cpu:0"):#Random variables segfaults on gpu
-	W1 = tf.Variable(tf.truncated_normal([784, 10], stddev=sd))
-	B1 = tf.Variable(tf.constant(0.1, tf.float32, [10]))
+"""
+nets = []
+for i in range(10):
+	nets.append(Net(i))
+"""
 
-#a = tf.reshape(X, shape=[-1, 28*28])
-#Y= tf.nn.softmax(tf.matmul(a, W1) + B1)
 net = Net()
 
 cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=net.Y, labels=y_)
@@ -88,18 +87,25 @@ sess.run(init)
 for ep in range(50):
 	for i in range(int(math.floor(55000/batch_size))):
 		batch_X, batch_Y = mnist.train.next_batch(min(batch_size, 55000-batch_size*i))
-
+		#Learning rate
 		lr_max = 0.02
 		lr_min = 0.0001
 		decay_rate = 1600
 		learning_rate = lr_min + (lr_max - lr_min) * math.exp(-ep/decay_rate)
+		"""
+		#Train the nets in parallel or seperately?
+		for n in range(len(nets)):
+			lab = convert(batch_Y, n)
+			sess.run([train_step, error, nets[n].Y], feed_dict={X: batch_X, y_: lab, lr: learning_rate, training: True})[2]
+		"""
+			
+
+
 		#This takes way longer with gpu, but only the first time
 		err = sess.run([train_step, error, net.Y], feed_dict={X: batch_X, y_: batch_Y, lr: learning_rate, training: True})[2]
 		print(i)
 
 	print(sess.run(accuracy, feed_dict={X: mnist.test.images, y_: mnist.test.labels}))
-
-
 
 
 
